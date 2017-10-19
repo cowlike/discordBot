@@ -17,18 +17,20 @@ let env =
 
 let envDef key defVal = Option.defaultValue defVal (env key)
 
-let asyncClient token = async {
+let asyncClient token = 
     let client = new DiscordSocketClient()
-    do buildHandler(client)
-    do! client.LoginAsync(TokenType.Bot, token) |> Async.AwaitTask
-    do! client.StartAsync() |> Async.AwaitTask
-    return! Task.Delay -1 |> Async.AwaitTask 
-}
+    buildHandler(client) |> ignore
+    
+    async {
+        do! client.LoginAsync(TokenType.Bot, token) |> Async.AwaitTask
+        do! client.StartAsync() |> Async.AwaitTask
+        return! Task.Delay -1 |> Async.AwaitTask 
+    }
 
 [<EntryPoint>]
 let main argv =
     match env "BOT_TOKEN" with
-    | Some token -> 
+    | Some token ->
         asyncClient token |> Async.RunSynchronously
         0
     | _ -> 1
