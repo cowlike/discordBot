@@ -6,15 +6,29 @@ open Discord
 open Discord.WebSocket
 open CommandHandler
 
-let asyncClient =
-    let client = new DiscordSocketClient()
-    buildHandler(client)
-    client.LoginAsync(TokenType.Bot, "MzI0MzQ5NDIyOTI0MzMzMDU2.DMLdcQ.fx8MAUXhrAtrCrYdUt9qe8d6fnE") |> ignore
-    client.StartAsync() |> ignore
-    Task.Delay -1 |> Async.AwaitTask 
+let env = 
+  let envVars = 
+    System.Environment.GetEnvironmentVariables()
+    |> Seq.cast<System.Collections.DictionaryEntry>
+    |> Seq.map (fun d -> string d.Key, string d.Value)
+    |> Map.ofSeq
 
+  fun key -> Map.tryFind key envVars
+
+let envDef key defVal = Option.defaultValue defVal (env key)
+
+let asyncClient token = async {
+    let client = new DiscordSocketClient()
+    do buildHandler(client)
+    do! client.LoginAsync(TokenType.Bot, token) |> Async.AwaitTask
+    do! client.StartAsync() |> Async.AwaitTask
+    return! Task.Delay -1 |> Async.AwaitTask 
+}
 
 [<EntryPoint>]
 let main argv =
-    asyncClient |> Async.RunSynchronously
-    0
+    match env "BOT_TOKEN" with
+    | Some token -> 
+        asyncClient token |> Async.RunSynchronously
+        0
+    | _ -> 1
