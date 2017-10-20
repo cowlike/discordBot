@@ -5,17 +5,7 @@ open System.Threading.Tasks
 open Discord
 open Discord.WebSocket
 open CommandHandler
-
-let env = 
-  let envVars = 
-    System.Environment.GetEnvironmentVariables()
-    |> Seq.cast<System.Collections.DictionaryEntry>
-    |> Seq.map (fun d -> string d.Key, string d.Value)
-    |> Map.ofSeq
-
-  fun key -> Map.tryFind key envVars
-
-let envDef key defVal = Option.defaultValue defVal (env key)
+open Util
 
 let asyncClient token = 
     let client = new DiscordSocketClient()
@@ -33,4 +23,6 @@ let main argv =
     | Some token ->
         asyncClient token |> Async.RunSynchronously
         0
-    | _ -> 1
+    | _ -> 
+        printfn "Set environment variable BOT_TOKEN with the bot token"
+        1

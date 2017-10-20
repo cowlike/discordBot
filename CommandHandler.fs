@@ -6,9 +6,11 @@ open System.Threading.Tasks
 
 let messageRecieved (client: DiscordSocketClient) (service: CommandService) (sm: SocketMessage) = 
     let message = sm :?> SocketUserMessage
-    let context = SocketCommandContext(client, message)
-    if message.Author.IsBot || isNull message then Task.CompletedTask
-    else context.Channel.SendMessageAsync(message.Content) :> Task
+    if isNull message || message.Author.IsBot || not (message.Content.StartsWith("//")) then
+        Task.CompletedTask
+    else
+        let context = SocketCommandContext(client, message)
+        context.Channel.SendMessageAsync(message.Content) :> Task
 
 let initServer (client: DiscordSocketClient) = Task.CompletedTask
 
