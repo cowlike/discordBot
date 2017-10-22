@@ -18,7 +18,7 @@ let asyncClient token =
     }
 
 [<EntryPoint>]
-let main argv =
+let main _ =
     match env "BOT_TOKEN" with
     | Some token ->
         asyncClient token |> Async.RunSynchronously
