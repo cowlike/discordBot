@@ -2,6 +2,8 @@ module Util
 
 ///Some helper functions
 
+let lowerCase (s: string) = s.ToLower()
+
 let env = 
   let envVars = 
     System.Environment.GetEnvironmentVariables()

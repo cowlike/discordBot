@@ -3,14 +3,14 @@ module CommandHandler
 open Discord.Commands
 open Discord.WebSocket
 open System.Threading.Tasks
+open Commands
 
-let messageRecieved (client: DiscordSocketClient) (service: CommandService) (sm: SocketMessage) = 
+let messageRecieved (client: DiscordSocketClient) _ (sm: SocketMessage) = 
     let message = sm :?> SocketUserMessage
-    if isNull message || message.Author.IsBot || not (message.Content.StartsWith("//")) then
+    if isNull message || message.Author.IsBot || not (message.Content.StartsWith(commandPrefix)) then
         Task.CompletedTask
     else
-        let context = SocketCommandContext(client, message)
-        context.Channel.SendMessageAsync(message.Content) :> Task
+        doCommand client message
 
 let initServer (client: DiscordSocketClient) = Task.CompletedTask
 
