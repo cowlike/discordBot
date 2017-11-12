@@ -6,9 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Types.fs" />
     <Compile Include="Util.fs" />
-    <Compile Include="Commands.fs" />
     <Compile Include="CommandHandler.fs" />
+    <Compile Include="Commands.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>
 
