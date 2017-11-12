@@ -7,19 +7,21 @@ open System.Threading.Tasks
 
 type Handler = DiscordSocketClient -> SocketUserMessage -> string array -> Task
 
-let echo client msg (args: string array)  =
+let sendMsg client msg msgOut =
     let context = SocketCommandContext(client, msg)
-    let msgOut = String.Join(" ", args)
     context.Channel.SendMessageAsync(msgOut) :> Task
 
-let foo client msg args = 
-    let context = SocketCommandContext(client, msg)
-    let msgOut = sprintf "arg list = %A" args
-    context.Channel.SendMessageAsync(msgOut) :> Task
+let echo client msg (args: string array)  =
+    String.Join(" ", args)
+    |> sendMsg client msg
+
+let foo client msg args =
+    sprintf "arg list = %A" args
+    |> sendMsg client msg
 
 let unknown client msg _ = 
-    let context = SocketCommandContext(client, msg)
-    context.Channel.SendMessageAsync("Unknown command") :> Task
+    "Unknown command"
+    |> sendMsg client msg
 
 let commands: string -> Handler = 
     let cmds =

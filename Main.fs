@@ -1,4 +1,4 @@
-﻿module Entry
+﻿module Main
 
 open System
 open System.Threading.Tasks
@@ -14,6 +14,7 @@ let asyncClient token =
     async {
         do! client.LoginAsync(TokenType.Bot, token) |> Async.AwaitTask
         do! client.StartAsync() |> Async.AwaitTask
+        do  printfn "bot running..."
         return! Task.Delay -1 |> Async.AwaitTask 
     }
 
