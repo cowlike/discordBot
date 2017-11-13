@@ -4,6 +4,7 @@ open CommandHandler
 open Commands
 open Util
 
+[<EntryPoint>]
 let main _ =
     match env "BOT_TOKEN" with
     | Some token ->

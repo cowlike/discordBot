@@ -1,10 +1,14 @@
 module Commands
 
 open System
-open CommandHandler
-open Types
+open System.Threading.Tasks
+open Discord.Commands
 
-let private echo client msg (args: string array) =
+let private sendMsg client msg msgOut =
+    let context = SocketCommandContext(client, msg)
+    context.Channel.SendMessageAsync(msgOut) :> Task
+
+let private echo client msg (args: string seq) =
     String.Join(" ", args)
     |> sendMsg client msg
 
@@ -12,5 +16,5 @@ let private foo client msg args =
     sprintf "arg list = %A" args
     |> sendMsg client msg
 
-let public botCommands () : (string * Handler) list
-    = [("echo", echo); ("foo", foo)]
+let public botCommands () = 
+    [("echo", echo); ("foo", foo)]

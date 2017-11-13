@@ -1,52 +1,63 @@
 module CommandHandler
 
+open System.Threading.Tasks
+open FParsec
 open Discord.Commands
 open Discord.WebSocket
-open System.Threading.Tasks
-open Util
-open Types
 
 let private commandPrefix = "//"
 
-let private skipPrefix (s: string) =
-    if s.StartsWith(commandPrefix) 
-    then s.Substring(String.length commandPrefix) 
-    else s
+let errorMsg error client msg = 
+    let context = SocketCommandContext(client, msg)
+    context.Channel.SendMessageAsync(error) :> Task
 
-let private doCommand (commands: string -> Handler) (client: DiscordSocketClient) (msg: SocketUserMessage) =
-    let msgParts = msg.Content.Split(" ")
-    let cmdName = msgParts |> Array.head |> skipPrefix |> lowerCase
-    let args = Array.tail msgParts
-    (client, msg, args) |||> commands cmdName
+let inline mkStr s = Seq.fold (fun acc v -> acc + string v) "" s
 
-let private messageReceived commands (client: DiscordSocketClient) _ (sm: SocketMessage) = 
+let quoted = 
+    let nonQuote = satisfy ((<>) '"')
+    between (pchar '"') (pchar '"') (manyChars nonQuote)
+
+let word = 
+    let nonSpace = satisfy ((<>) ' ')
+    spaces >>. many1 nonSpace .>> spaces |>> mkStr
+
+let argument = quoted <|> word
+
+let msgParser = skipString commandPrefix >>. tuple2 word (many argument)
+
+let private doCommand commands client (msg: SocketUserMessage) =
+    match run msgParser msg.Content with
+    | Success ((cmdName,args), _, _) -> 
+        (client, msg, args) |||> commands cmdName
+    | Failure (error, _, _) -> errorMsg error client msg
+
+let private messageReceived commands client _ (sm: SocketMessage) = 
     let message = sm :?> SocketUserMessage
-    if isNull message || message.Author.IsBot || not (message.Content.StartsWith(commandPrefix)) then
+    if isNull message 
+        || message.Author.IsBot 
+        || not (message.Content.StartsWith(commandPrefix)) then
         Task.CompletedTask
     else
         doCommand commands client message
 
+let private mkCommandRetriever commandList = 
+    let unknown msg = fun c m _ -> errorMsg msg c m
+    let cmds = commandList |> Map.ofList
+    fun cmdName -> Option.defaultValue (unknown "Unknown command") <| Map.tryFind cmdName cmds
+
 let private initServer (_: DiscordSocketClient) = Task.CompletedTask
 
-let public buildHandler (client: DiscordSocketClient) commands = 
-    let service = CommandService()
+/// Public API
 
-    client.add_MessageReceived(fun sm -> messageReceived commands client service sm)
+let public buildHandler (client: DiscordSocketClient) msgReceiver = 
+    let service = CommandService()
+    client.add_MessageReceived(fun sm -> msgReceiver client service sm)
     client.add_Ready(fun () -> initServer client)
 
-let public sendMsg client msg msgOut =
-    let context = SocketCommandContext(client, msg)
-    context.Channel.SendMessageAsync(msgOut) :> Task
-
-let public unknown client msg _ = sendMsg client msg "Unknown command"
-
-let private commands commandList = 
-    let cmds = commandList |> Map.ofList
-    fun cmdName -> Option.defaultValue unknown <| Map.tryFind cmdName cmds
-
 let public runBot token botCommands = 
+    let msgReceiver = botCommands |> mkCommandRetriever |> messageReceived
     let client = new DiscordSocketClient()
-    buildHandler client (commands <| botCommands) |> ignore
+    buildHandler client msgReceiver
     
     async {
         do! client.LoginAsync(Discord.TokenType.Bot, token) |> Async.AwaitTask
@@ -54,5 +65,3 @@ let public runBot token botCommands =
         do  printfn "bot running..."
         return! Task.Delay -1 |> Async.AwaitTask 
     } |> Async.RunSynchronously
-
-
