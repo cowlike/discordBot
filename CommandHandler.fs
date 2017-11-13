@@ -47,21 +47,25 @@ let private mkCommandRetriever commandList =
 
 let private initServer (_: DiscordSocketClient) = Task.CompletedTask
 
-/// Public API
-
-let public buildHandler (client: DiscordSocketClient) msgReceiver = 
+let private buildHandler (client: DiscordSocketClient) msgReceiver = 
     let service = CommandService()
     client.add_MessageReceived(fun sm -> msgReceiver client service sm)
     client.add_Ready(fun () -> initServer client)
 
+/// Public API
+
 let public runBot token botCommands = 
-    let msgReceiver = botCommands |> mkCommandRetriever |> messageReceived
-    let client = new DiscordSocketClient()
-    buildHandler client msgReceiver
-    
-    async {
-        do! client.LoginAsync(Discord.TokenType.Bot, token) |> Async.AwaitTask
-        do! client.StartAsync() |> Async.AwaitTask
-        do  printfn "bot running..."
-        return! Task.Delay -1 |> Async.AwaitTask 
-    } |> Async.RunSynchronously
+    try
+        let msgReceiver = botCommands |> mkCommandRetriever |> messageReceived
+        let client = new DiscordSocketClient()
+        buildHandler client msgReceiver
+        
+        async {
+            do! client.LoginAsync(Discord.TokenType.Bot, token) |> Async.AwaitTask
+            do! client.StartAsync() |> Async.AwaitTask
+            do  printfn "bot running..."
+            return! Task.Delay -1 |> Async.AwaitTask 
+        } |> Async.RunSynchronously
+
+        Util.Success 0
+    with ex -> Util.Failure ex.Message
