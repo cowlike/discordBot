@@ -51,6 +51,8 @@ let private buildHandler (client: DiscordSocketClient) msgReceiver =
     let service = CommandService()
     client.add_MessageReceived(fun sm -> msgReceiver client service sm)
     client.add_Ready(fun () -> initServer client)
+    client.add_LoggedIn(fun () -> printfn "bot logged in..."; Task.CompletedTask)
+    client.add_Ready(fun () -> printfn "bot is ready"; Task.CompletedTask)
 
 /// Public API
 
@@ -63,7 +65,6 @@ let public runBot token botCommands =
         async {
             do! client.LoginAsync(Discord.TokenType.Bot, token) |> Async.AwaitTask
             do! client.StartAsync() |> Async.AwaitTask
-            do  printfn "bot running..."
             return! Task.Delay -1 |> Async.AwaitTask 
         } |> Async.RunSynchronously
 

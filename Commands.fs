@@ -16,5 +16,7 @@ let private foo client msg args =
     sprintf "arg list = %A" args
     |> sendMsg client msg
 
-let public botCommands () = 
-    [("echo", echo); ("foo", foo)]
+let public botCommands () = [
+    ("echo", echo)
+    ("foo", foo)
+    ]
