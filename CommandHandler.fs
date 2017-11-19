@@ -45,14 +45,15 @@ let private mkCommandRetriever commandList =
     let cmds = commandList |> Map.ofList
     fun cmdName -> Option.defaultValue (unknown "Unknown command") <| Map.tryFind cmdName cmds
 
-let private initServer (_: DiscordSocketClient) = Task.CompletedTask
+let private logTask msg = 
+    fun () -> printfn "%s" msg
+    |> Task.Factory.StartNew
 
 let private buildHandler (client: DiscordSocketClient) msgReceiver = 
     let service = CommandService()
     client.add_MessageReceived(fun sm -> msgReceiver client service sm)
-    client.add_Ready(fun () -> initServer client)
-    client.add_LoggedIn(fun () -> printfn "bot logged in..."; Task.CompletedTask)
-    client.add_Ready(fun () -> printfn "bot is ready"; Task.CompletedTask)
+    client.add_LoggedIn(fun() -> logTask "bot logged in...")
+    client.add_Ready(fun() -> logTask "bot is ready")
 
 /// Public API
 
