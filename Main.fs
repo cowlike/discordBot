@@ -2,6 +2,7 @@
 
 open CommandHandler
 open Commands
+open Types
 open Util
 
 [<EntryPoint>]

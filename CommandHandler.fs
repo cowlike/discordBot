@@ -4,6 +4,7 @@ open System.Threading.Tasks
 open FParsec
 open Discord.Commands
 open Discord.WebSocket
+open Types
 
 let private commandPrefix = "//"
 
@@ -27,9 +28,9 @@ let msgParser = skipString commandPrefix >>. tuple2 word (many argument)
 
 let private doCommand commands client (msg: SocketUserMessage) =
     match run msgParser msg.Content with
-    | Success ((cmdName,args), _, _) -> 
+    | ParserResult.Success ((cmdName,args), _, _) -> 
         (client, msg, args) |||> commands cmdName
-    | Failure (error, _, _) -> errorMsg error client msg
+    | ParserResult.Failure (error, _, _) -> errorMsg error client msg
 
 let private messageReceived commands client _ (sm: SocketMessage) = 
     let message = sm :?> SocketUserMessage
@@ -54,6 +55,8 @@ let private buildHandler (client: DiscordSocketClient) msgReceiver =
     client.add_MessageReceived(fun sm -> msgReceiver client service sm)
     client.add_LoggedIn(fun() -> logTask "bot logged in...")
     client.add_Ready(fun() -> logTask "bot is ready")
+    client.add_ChannelCreated(fun ch -> logTask <| sprintf "channel %s created" (ch.ToString()))
+    client.add_ChannelDestroyed(fun ch -> logTask <| sprintf "channel %s destroyed" (ch.ToString()))
 
 /// Public API
 
@@ -69,5 +72,5 @@ let public runBot token botCommands =
             return! Task.Delay -1 |> Async.AwaitTask 
         } |> Async.RunSynchronously
 
-        Util.Success 0
-    with ex -> Util.Failure ex.Message
+        Success 0
+    with ex -> Failure ex.Message

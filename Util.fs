@@ -2,8 +2,6 @@ module Util
 
 ///Some helper functions
 
-type Success<'a,'b> = Success of 'a | Failure of 'b
-
 let lowerCase (s: string) = s.ToLower()
 
 let env = 

@@ -51,3 +51,4 @@ Ankh.NoLoad
 !/packages/*/lib/*/*.dll
 
 token
+SampleParser.fsx
