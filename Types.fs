@@ -5,4 +5,4 @@ open System.Threading.Tasks
 
 type Result<'a,'b> = Success of 'a | Failure of 'b
 
-type Handler = DiscordSocketClient -> SocketUserMessage -> string list -> Result<Task,string>
+type Handler = Handler of (DiscordSocketClient -> SocketUserMessage -> string list -> Result<Task,string>)
