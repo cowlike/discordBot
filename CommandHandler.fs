@@ -29,7 +29,11 @@ let msgParser = skipString commandPrefix >>. tuple2 word (many argument)
 let private doCommand commands client (msg: SocketUserMessage) =
     match run msgParser msg.Content with
     | ParserResult.Success ((cmdName,args), _, _) -> 
-        (client, msg, args) |||> commands cmdName
+        (client, msg, args) 
+        |||> commands cmdName
+        |> function
+            | Success task -> task
+            | Failure err -> errorMsg err client msg
     | ParserResult.Failure (error, _, _) -> errorMsg error client msg
 
 let private messageReceived commands client _ (sm: SocketMessage) = 
@@ -42,7 +46,7 @@ let private messageReceived commands client _ (sm: SocketMessage) =
         doCommand commands client message
 
 let private mkCommandRetriever commandList = 
-    let unknown msg = fun c m _ -> errorMsg msg c m
+    let unknown msg = fun c m _ -> Failure msg
     let cmds = commandList |> Map.ofList
     fun cmdName -> Option.defaultValue (unknown "Unknown command") <| Map.tryFind cmdName cmds
 
