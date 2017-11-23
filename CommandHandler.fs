@@ -47,7 +47,7 @@ let private messageReceived commands client _ (sm: SocketMessage) =
         doCommand commands client message
 
 let private mkCommandRetriever commandList = 
-    let unknown msg = (fun c m _ -> Failure msg) |> Handler
+    let unknown msg = (fun _ _ _ -> Failure msg) |> Handler
     let cmds = commandList |> Map.ofList
     fun cmdName -> Option.defaultValue (unknown "Unknown command") <| Map.tryFind cmdName cmds
 
