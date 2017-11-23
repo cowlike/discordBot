@@ -10,10 +10,9 @@ let private sendMsg client msg msgOut =
     let context = SocketCommandContext(client, msg)
     context.Channel.SendMessageAsync(msgOut) :> Task
 
-let private echo client msg (args: string list) =
-    String.Join(" ", args)
-    |> sendMsg client msg
-    |> Success
+let private echo client msg = function
+    | [S s] -> sendMsg client msg s |> Success
+    | _ -> Failure "Echo takes a single string"
 
 let private showArgs client msg args =
     sprintf "arg list = %A" args
@@ -31,20 +30,24 @@ let private showGuilds (client: DiscordSocketClient) msg _ =
     |> sendMsg client msg
     |> Success
 
-let private newChannel (client: DiscordSocketClient) _ (args: string list) =
-    try
-        let guild = client.Guilds |> Seq.head
-        guild.CreateTextChannelAsync(args.[0]) :> Task
-        |> Success
-    with ex -> Failure ex.Message
+let private newChannel (client: DiscordSocketClient) _ = function
+    | (S channelName) :: _ -> 
+        try
+            let guild = client.Guilds |> Seq.head
+            guild.CreateTextChannelAsync(channelName) :> Task
+            |> Success
+        with ex -> Failure ex.Message
+    | _ -> Failure "Missing channel name"
 
-let private rmChannel (client: DiscordSocketClient) _ (args: string list) =
-    try
-        let guild = client.Guilds |> Seq.head
-        let channel = guild.GetChannel (args.[0] |> uint64)
-        channel.DeleteAsync ()
-        |> Success
-    with ex -> Failure ex.Message
+let private rmChannel (client: DiscordSocketClient) _ = function
+    | (U id) :: _ -> 
+        try
+            let guild = client.Guilds |> Seq.head
+            let channel = guild.GetChannel id
+            channel.DeleteAsync ()
+            |> Success
+        with ex -> Failure ex.Message
+    | _ -> Failure "Missing channel id"
 
 let botCommands () = [
     ("echo", Handler echo)

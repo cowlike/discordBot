@@ -5,8 +5,7 @@ open FParsec
 open Discord.Commands
 open Discord.WebSocket
 open Types
-
-let private commandPrefix = "//"
+open Parsers
 
 let errorMsg error client msg = 
     let context = SocketCommandContext(client, msg)
@@ -14,20 +13,8 @@ let errorMsg error client msg =
 
 let inline mkStr s = Seq.fold (fun acc v -> acc + string v) "" s
 
-let quoted = 
-    let nonQuote = satisfy ((<>) '"')
-    between (pchar '"') (pchar '"') (manyChars nonQuote)
-
-let word = 
-    let nonSpace = satisfy ((<>) ' ')
-    spaces >>. many1 nonSpace .>> spaces |>> mkStr
-
-let argument = quoted <|> word
-
-let msgParser = skipString commandPrefix >>. tuple2 word (many argument)
-
 let private doCommand commands client (msg: SocketUserMessage) =
-    match run msgParser msg.Content with
+    match run pCommand msg.Content with
     | ParserResult.Success ((cmdName,args), _, _) ->
         let (Handler handler) = commands cmdName  
         (client, msg, args) 
