@@ -19,9 +19,11 @@ let pargument = pquoted <|> pword
 
 let pwString = pargument |>> S
 
-let pwInt = skipString "'I" >>. pint64 .>> spaces |>> I
+let pwInt = skipString "'I " >>. pint64 .>> spaces |>> I
 
-let pwUint = skipString "'U" >>. puint64 .>> spaces |>> U
+let pwInt32 = skipString "'I32 " >>. pint32 .>> spaces |>> I32
+
+let pwUint = skipString "'U " >>. puint64 .>> spaces |>> U
 
 let pwFloat = pfloat .>> spaces |>> F
         
@@ -29,11 +31,17 @@ let pwBool =
     (pstring "True" <|> pstring "False") .>> spaces
     |>> function | "True" -> B true | _ -> B false
 
-let pwrapped = pwInt <|> pwUint <|> pwBool <|> pwFloat <|> pwString
+let pwrapped = 
+    pwInt32 
+    <|> pwInt
+    <|> pwUint 
+    <|> pwBool 
+    <|> pwFloat 
+    <|> pwString
 
 let pwrappedMany = many pwrapped
 
-/// Another way using the combinator primitives
+/// Parse bot command
 
 let pCommand: Parser<(string * Wrapped list), unit> = 
   spaces >>. skipString commandPrefix >>. tuple2 pword pwrappedMany
