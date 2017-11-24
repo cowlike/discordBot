@@ -36,7 +36,7 @@ let pwrappedMany = many pwrapped
 /// Another way using the combinator primitives
 
 let pCommand: Parser<(string * Wrapped list), unit> = 
-  spaces >>. skipString "//" >>. tuple2 pword pwrappedMany
+  spaces >>. skipString commandPrefix >>. tuple2 pword pwrappedMany
 
 // simple test
 // let args = "  //echo aString False 11 \"a quoted string\" 'I42 True true 98.4"

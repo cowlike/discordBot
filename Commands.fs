@@ -31,7 +31,7 @@ let private showGuilds (client: DiscordSocketClient) msg _ =
     |> Success
 
 let private newChannel (client: DiscordSocketClient) _ = function
-    | (S channelName) :: _ -> 
+    | S channelName :: _ -> 
         try
             let guild = client.Guilds |> Seq.head
             guild.CreateTextChannelAsync(channelName) :> Task
@@ -40,10 +40,17 @@ let private newChannel (client: DiscordSocketClient) _ = function
     | _ -> Failure "Missing channel name"
 
 let private rmChannel (client: DiscordSocketClient) _ = function
-    | (U id) :: _ -> 
+    | U id :: _ -> 
         try
             let guild = client.Guilds |> Seq.head
             let channel = guild.GetChannel id
+            channel.DeleteAsync ()
+            |> Success
+        with ex -> Failure ex.Message
+    | S name :: _ ->
+        try
+            let guild = client.Guilds |> Seq.head
+            let channel = Seq.find (fun (ch: SocketGuildChannel) -> ch.Name = name) guild.Channels
             channel.DeleteAsync ()
             |> Success
         with ex -> Failure ex.Message
