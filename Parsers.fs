@@ -19,11 +19,13 @@ let pargument = pquoted <|> pword
 
 let pwString = pargument |>> S
 
-let pwInt = skipString "'I " >>. pint64 .>> spaces |>> I
-
 let pwInt32 = skipString "'I32 " >>. pint32 .>> spaces |>> I32
 
-let pwUint = skipString "'U " >>. puint64 .>> spaces |>> U
+let pwInt64 = skipString "'I64 " >>. pint64 .>> spaces |>> I64
+
+let pwUint32 = skipString "'U32 " >>. puint32 .>> spaces |>> U32
+
+let pwUint64 = skipString "'U64 " >>. puint64 .>> spaces |>> U64
 
 let pwFloat = pfloat .>> spaces |>> F
         
@@ -32,9 +34,10 @@ let pwBool =
     |>> function | "True" -> B true | _ -> B false
 
 let pwrapped = 
-    pwInt32 
-    <|> pwInt
-    <|> pwUint 
+    pwInt32
+    <|> pwInt64
+    <|> pwUint32
+    <|> pwUint64 
     <|> pwBool 
     <|> pwFloat 
     <|> pwString
@@ -45,7 +48,3 @@ let pwrappedMany = many pwrapped
 
 let pCommand: Parser<(string * Wrapped list), unit> = 
   spaces >>. skipString commandPrefix >>. tuple2 pword pwrappedMany
-
-// simple test
-// let args = "  //echo aString False 11 \"a quoted string\" 'I42 True true 98.4"
-// let tupled = run pCommand args

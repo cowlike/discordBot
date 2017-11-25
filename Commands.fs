@@ -39,22 +39,19 @@ let private newChannel (client: DiscordSocketClient) _ = function
         with ex -> Failure ex.Message
     | _ -> Failure "Missing channel name"
 
-let private rmChannel (client: DiscordSocketClient) _ = function
-    | U id :: _ -> 
-        try
-            let guild = client.Guilds |> Seq.head
-            let channel = guild.GetChannel id
-            channel.DeleteAsync ()
-            |> Success
-        with ex -> Failure ex.Message
-    | S name :: _ ->
-        try
-            let guild = client.Guilds |> Seq.head
-            let channel = Seq.find (fun (ch: SocketGuildChannel) -> ch.Name = name) guild.Channels
-            channel.DeleteAsync ()
-            |> Success
-        with ex -> Failure ex.Message
-    | _ -> Failure "Missing channel id"
+let private rmChannel (client: DiscordSocketClient) (msg: SocketUserMessage) args = 
+    let rm (ch: SocketGuildChannel) = ch.DeleteAsync() |> Success
+    try
+        let guild = client.Guilds |> Seq.head
+        match args with
+        | U64 id :: _ -> 
+            guild.GetChannel id |> rm
+        | S name :: _ ->
+            guild.Channels
+            |> Seq.find (fun (ch: SocketGuildChannel) -> ch.Name = name)
+            |> rm
+        | _ -> Failure "Missing channel id"
+    with ex -> Failure ex.Message
 
 let botCommands () = [
     ("echo", Handler echo)
