@@ -19,28 +19,46 @@ let pargument = pquoted <|> pword
 
 let pwString = pargument |>> S
 
-let pwInt32 = skipString "'I32 " >>. pint32 .>> spaces |>> I32
+//32-bit int
+let pwInt32 = attempt (pint32 .>> skipString "I32" .>> spaces |>> I32)
 
-let pwInt64 = skipString "'I64 " >>. pint64 .>> spaces |>> I64
+let pwInt32' = attempt (pint32 .>> skipChar 'I' .>> spaces |>> I32)
 
-let pwUint32 = skipString "'U32 " >>. puint32 .>> spaces |>> U32
+//64-bit int
+let pwInt64 = attempt (pint64 .>> skipString "I64" .>> spaces |>> I64)
 
-let pwUint64 = skipString "'U64 " >>. puint64 .>> spaces |>> U64
+let pwInt64' = attempt (pint64 .>> skipChar 'L' .>> spaces |>> I64)
 
+//32-bit unsigned int
+let pwUInt32 = attempt (puint32 .>> skipString "U32" .>> spaces |>> U32)
+
+let pwUInt32' = attempt (puint32 .>> skipChar 'U' .>> spaces |>> U32)
+
+//64-bit unsigned int
+let pwUInt64 = attempt (puint64 .>> skipString "U64" .>> spaces |>> U64)
+
+let pwUInt64' = attempt (puint64 .>> skipString "UL" .>> spaces |>> U64)
+
+//float
 let pwFloat = pfloat .>> spaces |>> F
-        
+
 let pwBool = 
     (pstring "True" <|> pstring "False") .>> spaces
     |>> function | "True" -> B true | _ -> B false
 
 let pwrapped = 
-    pwInt32
-    <|> pwInt64
-    <|> pwUint32
-    <|> pwUint64 
-    <|> pwBool 
-    <|> pwFloat 
-    <|> pwString
+    choice [
+        pwInt32
+        pwInt64
+        pwUInt32
+        pwUInt64
+        pwUInt64'
+        pwInt32'
+        pwInt64'
+        pwUInt32'
+        pwBool 
+        pwFloat 
+        pwString ]
 
 let pwrappedMany = many pwrapped
 

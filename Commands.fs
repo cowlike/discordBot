@@ -19,14 +19,22 @@ let private showArgs client msg args =
     |> sendMsg client msg
     |> Success
 
-let private showGuilds (client: DiscordSocketClient) msg _ = 
-    let showChannel (ch: SocketGuildChannel) = 
-        sprintf "(%i, %s, %A)" ch.Id ch.Name <| ch.GetType()
+let private join ch (xs: seq<string>) = String.Join(ch, xs)
 
-    let join ch (xs: seq<string>) = String.Join(ch, xs)
+let showChannels channels =
+    let showChannel (ch: SocketChannel) = 
+        sprintf "(%A, %s, %A)" (ch.Id) (ch.ToString()) (ch.GetType())
+    "[" + (Seq.map showChannel channels |> join "\n") + "]\n"
+
+let private showGuilds (client: DiscordSocketClient) msg _ = 
     client.Guilds |>
-    Seq.map (fun g -> g.Name + ": [" + (Seq.map showChannel g.Channels |> join "\n") + "]")
+    Seq.map (fun (g: SocketGuild) -> g.Name + ": " + showChannels g.Channels)
     |> join ", "
+    |> sendMsg client msg
+    |> Success
+
+let private showDMChannels (client: DiscordSocketClient) msg _ = 
+    showChannels client.DMChannels
     |> sendMsg client msg
     |> Success
 
@@ -57,5 +65,6 @@ let botCommands () = [
     ("echo", Handler echo)
     ("showArgs", Handler showArgs)
     ("showGuilds", Handler showGuilds)
+    ("showDMChannels", Handler showDMChannels)
     ("newChannel", Handler newChannel)
     ("rmChannel", Handler rmChannel) ]
