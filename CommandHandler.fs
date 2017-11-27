@@ -16,7 +16,10 @@ let inline mkStr s = Seq.fold (fun acc v -> acc + string v) "" s
 let private hasPrefix (msg: SocketUserMessage) = msg.Content.StartsWith(commandPrefix)
 
 let private doCommand commands client (msg: SocketUserMessage) =
-    let content = if hasPrefix msg then msg.Content.Substring(2) else msg.Content
+    let content = 
+        if hasPrefix msg 
+        then msg.Content.Substring(String.length commandPrefix) 
+        else msg.Content
     match run pCommand content with
     | ParserResult.Success ((cmdName,args), _, _) ->
         let (Handler handler) = commands cmdName  
