@@ -13,8 +13,11 @@ let errorMsg error client msg =
 
 let inline mkStr s = Seq.fold (fun acc v -> acc + string v) "" s
 
+let private hasPrefix (msg: SocketUserMessage) = msg.Content.StartsWith(commandPrefix)
+
 let private doCommand commands client (msg: SocketUserMessage) =
-    match run pCommand msg.Content with
+    let content = if hasPrefix msg then msg.Content.Substring(2) else msg.Content
+    match run pCommand content with
     | ParserResult.Success ((cmdName,args), _, _) ->
         let (Handler handler) = commands cmdName  
         (client, msg, args) 
@@ -26,12 +29,11 @@ let private doCommand commands client (msg: SocketUserMessage) =
 
 let private messageReceived commands client _ (sm: SocketMessage) = 
     let message = sm :?> SocketUserMessage
-    if isNull message 
-        || message.Author.IsBot 
-        || not (message.Content.StartsWith(commandPrefix)) then
-        Task.CompletedTask
-    else
-        doCommand commands client message
+    if (not << isNull) message
+        && not message.Author.IsBot
+        && (message.Channel.Name.StartsWith("@") || hasPrefix message)
+    then doCommand commands client message
+    else Task.CompletedTask
 
 let private mkCommandRetriever commandList = 
     let unknown msg = (fun _ _ _ -> Failure msg) |> Handler

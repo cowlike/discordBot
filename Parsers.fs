@@ -65,4 +65,4 @@ let pwrappedMany = many pwrapped
 /// Parse bot command
 
 let pCommand: Parser<(string * Wrapped list), unit> = 
-  spaces >>. skipString commandPrefix >>. tuple2 pword pwrappedMany
+  spaces >>. tuple2 pword pwrappedMany
