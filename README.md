@@ -5,11 +5,12 @@ This is a simple test bot that implements a few commands. All commands are prece
 All of this can change at any time:
 
 * echo "a string"
-* showArgs 'I32 42 98.4 "98.4" True 'U64 99999999999999997
+* showArgs 32I 42 98.4 "98.4" True 64U 99999999999999997
 * showGuilds
+* showDMChannels
 * addChannel name
 * rmChannel name
-* rmChannel 'U64 id
+* rmChannel 1234567890U //channel id
 
 # Adding the bot to your server
 
