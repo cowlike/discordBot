@@ -14,11 +14,11 @@ All of this can change at any time:
 
 # Adding the bot to your server
 
-* login to https://discordapp.com/developers/docs/intro
+* login to [developer area](https://discordapp.com/developers/docs/intro)
 * go to My Apps
 * create a bot app
 * copy the Client ID of the bot
-* authorize the bot: https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID_GOES_HERE&scope=bot
+* [authorize](https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID_GOES_HERE&scope=bot) the bot 
 
 # Running the bot
 
