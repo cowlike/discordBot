@@ -1,7 +1,6 @@
 image : microsoft/dotnet:latest
 stages:
   - build
-#  - deploy
 before_script:
   - 'dotnet restore'
   ########
@@ -34,8 +33,3 @@ build:
    - 'ssh gitlab@52.165.134.100 killall DiscordBotFSharp && cd /opt/bot && ./DiscordBotFSharp'
  only:
    - master
-deploy:
- stage: deploy
- script:
-   - 'scp -r /builds/cowlike/discordFSharp/DiscordBotFSharp/publish/ gitlab@52.165.134.100/opt/bot'
-   - 'ssh gitlab@52.165.134.100 killall killall DiscordBotFSharp && cd /opt/bot && ./DiscordBotFSharp'
