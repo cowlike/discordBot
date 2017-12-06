@@ -3,7 +3,7 @@ module Types
 open Discord.WebSocket
 open System.Threading.Tasks
 
-type Result<'a,'b> = Success of 'a | Failure of 'b
+type Result<'a,'b> = Success of 'a | Fail of 'b
 
 type Wrapped = 
   S of string 
@@ -14,4 +14,9 @@ type Wrapped =
   | B of bool 
   | F of float
 
-type Handler = Handler of (DiscordSocketClient -> SocketUserMessage -> Wrapped list -> Result<Task,string>)
+type CommandName = Name of string
+type Command = DiscordSocketClient -> SocketUserMessage -> Wrapped list -> Result<Task,string>
+type ICommand =
+    abstract member Execute: Command
+
+type Handler = Handler of Command

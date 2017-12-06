@@ -14,3 +14,15 @@ let env =
   fun key -> Map.tryFind key envVars
 
 let envDef key defVal = Option.defaultValue defVal (env key)
+
+/// a "normal" Applicative operator would be applying a wrapped function
+/// to a wrapped value: 
+///     ('a -> 'b) option -> 'a option -> 'b option
+/// but here we are applying a wrapped function to a simple value:
+///     ('a -> 'b) option -> 'a -> 'b option
+
+let (<**>) mf x = 
+    match mf with 
+    | Some f -> Option.map f (Some x) 
+    | _      -> None
+

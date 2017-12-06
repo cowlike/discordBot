@@ -27,7 +27,7 @@ let private doCommand commands client (msg: SocketUserMessage) =
         |||> handler
         |> function
             | Success task -> task
-            | Failure err -> errorMsg err client msg
+            | Fail err -> errorMsg err client msg
     | ParserResult.Failure (error, _, _) -> errorMsg error client msg
 
 let private messageReceived commands client _ (sm: SocketMessage) = 
@@ -39,7 +39,7 @@ let private messageReceived commands client _ (sm: SocketMessage) =
     else Task.CompletedTask
 
 let private mkCommandRetriever commandList = 
-    let unknown msg = (fun _ _ _ -> Failure msg) |> Handler
+    let unknown msg = (fun _ _ _ -> Fail msg) |> Handler
     let cmds = commandList |> Map.ofList
     fun cmdName -> Option.defaultValue (unknown "Unknown command") <| Map.tryFind cmdName cmds
 
@@ -70,4 +70,4 @@ let public runBot token botCommands =
         } |> Async.RunSynchronously
 
         Success 0
-    with ex -> Failure ex.Message
+    with ex -> Fail ex.Message

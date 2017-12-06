@@ -7,9 +7,11 @@
     <Compile Include="Types.fs" />
     <Compile Include="Parsers.fs" />
     <Compile Include="Util.fs" />
+    <Compile Include="Plugins.fs" />
     <Compile Include="CommandHandler.fs" />
     <Compile Include="Commands.fs" />
     <Compile Include="Main.fs" />
+    <Compile Include="EchoPlugin.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="discord.net" Version="1.0.2" />
