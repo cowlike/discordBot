@@ -1,7 +1,6 @@
 image : microsoft/dotnet:latest
 stages:
-  - build
-  - deploy
+  - build, deploy
 before_script:
   - 'dotnet restore'
   ########
