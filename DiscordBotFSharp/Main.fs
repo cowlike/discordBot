@@ -11,6 +11,6 @@ let main _ =
     | Some token ->
         match botCommands() |> runBot token with
         | Success _ -> 0
-        | Failure msg -> printfn "%s" msg; 1
+        | Fail msg -> printfn "%s" msg; 1
     | _ -> 
         printfn "Set environment variable BOT_TOKEN with the bot token"; 1
