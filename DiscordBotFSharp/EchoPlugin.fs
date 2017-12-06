@@ -1,7 +1,5 @@
 module EchoPlugin
 
-open System.Threading.Tasks
-open Discord.Commands
 open Plugins
 open Types
 open Commands
