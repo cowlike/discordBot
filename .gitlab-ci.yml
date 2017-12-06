@@ -35,5 +35,5 @@ build:
 deploy:
  stage: deploy
  script:
-   - 'scp -r DiscordBotFSharp/publish/ gitlab@52.165.134.100/opt/bot'
+   - 'scp -r /builds/cowlike/discordFSharp/DiscordBotFSharp/publish/ gitlab@52.165.134.100/opt/bot'
    - 'ssh gitlab@52.165.134.100 killall killall DiscordBotFSharp && cd /opt/bot && ./DiscordBotFSharp'
