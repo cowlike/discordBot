@@ -28,9 +28,11 @@ before_script:
 build:
  stage: build
  script:
+   - 'dotnet build'
+   - 'dotnet test'
    - 'dotnet publish -c release -r linux-x64 -o publish'
-   - ssh gitlab@52.165.134.100 '( killall DiscordBotFSharp; echo "stopped" )'
-   - scp -r /builds/cowlike/discordFSharp/DiscordBotFSharp/publish/ gitlab@52.165.134.100:/opt/bot
-   - ssh gitlab@52.165.134.100 /home/gitlab/runbot.sh "$BOT_TOKEN"
+   #  - ssh gitlab@52.165.134.100 '( killall DiscordBotFSharp; echo "stopped" )'
+   #  - scp -r /builds/cowlike/discordFSharp/DiscordBotFSharp/publish/ gitlab@52.165.134.100:/opt/bot
+   #  - ssh gitlab@52.165.134.100 /home/gitlab/runbot.sh "$BOT_TOKEN"
  only:
    - master
