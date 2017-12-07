@@ -31,6 +31,6 @@ build:
    - 'dotnet publish -c release -r linux-x64 -o publish'
    - 'ssh gitlab@52.165.134.100 killall DiscordBotFSharp'
    - 'scp -r /builds/cowlike/discordFSharp/DiscordBotFSharp/publish/ gitlab@52.165.134.100:/opt/bot'
-   - 'ssh gitlab@52.165.134.100 /home/gitlab/runbot.sh'
+   - ssh gitlab@52.165.134.100 /home/gitlab/runbot.sh "$BOT_TOKEN"
  only:
    - master
