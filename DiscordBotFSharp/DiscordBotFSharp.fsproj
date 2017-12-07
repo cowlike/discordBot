@@ -10,7 +10,7 @@
     <Compile Include="Plugins.fs" />
     <Compile Include="CommandHandler.fs" />
     <Compile Include="Commands.fs" />
-    <Compile Include="EchoPlugin.fs" />
+    <Compile Include="PluginBundle.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>
   <ItemGroup>

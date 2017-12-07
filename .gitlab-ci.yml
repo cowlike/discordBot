@@ -29,7 +29,8 @@ build:
  stage: build
  script:
    - 'dotnet publish -c release -r linux-x64 -o publish'
-   - 'scp -r /builds/cowlike/discordFSharp/DiscordBotFSharp/publish/ gitlab@52.165.134.100:/opt/bot/'
+   - 'ssh gitlab@52.165.134.100 killall DiscordBotFSharp'
+   - 'scp -r /builds/cowlike/discordFSharp/DiscordBotFSharp/publish/ gitlab@52.165.134.100:/opt/bot'
    - 'ssh gitlab@52.165.134.100 /home/gitlab/runbot.sh'
  only:
    - master
