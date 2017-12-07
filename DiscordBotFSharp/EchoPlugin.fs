@@ -16,7 +16,7 @@ type T() =
 ///==========================
 let private version client msg = function
     | [S s] -> sendMsg client msg (s + " " + s) |> Success
-    | _ -> Fail "V1.0.0"
+    | _ -> Fail "V1.0.1"
 
 [<NamedCommandAttribute("version")>]
 type U() = 
