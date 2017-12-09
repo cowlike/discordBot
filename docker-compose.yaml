@@ -1,0 +1,5 @@
+version: '3'
+services:
+  dbot:
+    image: cowlike/discord-bot:latest
+    container_name: dbot
