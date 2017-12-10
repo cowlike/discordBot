@@ -50,7 +50,11 @@ let private logTask msg =
 let private buildHandler (client: DiscordSocketClient) msgReceiver = 
     let service = CommandService()
     client.add_MessageReceived(fun sm -> msgReceiver client service sm)
-    client.add_LoggedIn(fun() -> logTask "bot logged in...")
+    
+    client.add_Connected(fun() -> logTask "bot connected")
+    client.add_Disconnected(fun e -> logTask <| "bot disconnected: " + e.Message)
+    client.add_LoggedIn(fun() -> logTask "bot logged in")
+    client.add_LoggedOut(fun() -> logTask "bot logged out")
     client.add_Ready(fun() -> logTask "bot is ready")
     client.add_ChannelCreated(fun ch -> logTask <| sprintf "channel %s created" (ch.ToString()))
     client.add_ChannelDestroyed(fun ch -> logTask <| sprintf "channel %s destroyed" (ch.ToString()))

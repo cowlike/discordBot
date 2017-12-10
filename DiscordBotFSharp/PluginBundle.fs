@@ -14,7 +14,7 @@ module EchoPlugin =
 
 module VersionPlugin =
     let private version client msg _ = 
-        sendMsg client msg "V1.1.0" |> Success
+        sendMsg client msg "V1.2.0" |> Success
 
     [<NamedCommandAttribute("version")>]
     type T() = interface ICommand with member t.Execute = version
