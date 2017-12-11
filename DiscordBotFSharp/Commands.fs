@@ -6,11 +6,12 @@ open Discord.Commands
 open Discord.WebSocket
 open Types
 open Plugins
+open Util
 
 /// not private so it can be used by plugins
 let sendMsg client msg msgOut =
     let context = SocketCommandContext(client, msg)
-    context.Channel.SendMessageAsync(msgOut) :> Task
+    context.Channel.SendMessageAsync(stampMsg msgOut) :> Task
 
 let private echo client msg = function
     | [S s] -> sendMsg client msg s |> Success

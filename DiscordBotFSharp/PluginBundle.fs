@@ -3,6 +3,7 @@ module PluginBundle
 open Plugins
 open Types
 open Commands
+open Util
 
 module EchoPlugin =
     let private echo client msg = function
@@ -14,7 +15,7 @@ module EchoPlugin =
 
 module VersionPlugin =
     let private version client msg _ = 
-        sendMsg client msg "V1.2.0" |> Success
+        version() |> sendMsg client msg |> Success
 
     [<NamedCommandAttribute("version")>]
     type T() = interface ICommand with member t.Execute = version

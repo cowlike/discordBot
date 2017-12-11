@@ -2,6 +2,8 @@ module Util
 
 ///Some helper functions
 
+let version () = "v1.4.3"
+
 let lowerCase (s: string) = s.ToLower()
 
 let env = 
@@ -26,3 +28,6 @@ let (<**>) mf x =
     | Some f -> Option.map f (Some x) 
     | _      -> None
 
+let now (fmt: string) = System.DateTime.Now.ToString(fmt)
+
+let stampMsg msg = now "MM/dd hh:mm:ss:FFF" + ": " + msg
