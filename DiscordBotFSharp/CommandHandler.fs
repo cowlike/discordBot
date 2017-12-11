@@ -8,6 +8,7 @@ open Types
 open Parsers
 open Util
 open Discord
+open Microsoft.VisualBasic
 
 let errorMsg error client msg = 
     let context = SocketCommandContext(client, msg)
@@ -63,7 +64,10 @@ let private buildHandler (client: DiscordSocketClient) msgReceiver =
     client.add_LoggedIn(fun() -> logTask "bot logged in")
     client.add_LoggedOut(fun() -> logTask "bot logged out")
     client.add_Ready(fun() -> logTask "bot is ready")
-    client.add_LatencyUpdated(fun low hi -> logTask <| sprintf "latency (%d,%d); connect state (%A)" low hi client.ConnectionState)
+    client.add_LatencyUpdated(fun low hi -> 
+                                (low, hi, client.ConnectionState)
+                                |||> sprintf "latency (%d,%d); connect state (%A)"
+                                |> logTask)
     client.add_ChannelCreated(fun ch -> logTask <| sprintf "channel %s created" (ch.ToString()))
     client.add_ChannelDestroyed(fun ch -> logTask <| sprintf "channel %s destroyed" (ch.ToString()))
 
