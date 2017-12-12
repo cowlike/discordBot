@@ -2,7 +2,7 @@ module Util
 
 ///Some helper functions
 
-let version () = "v1.4.3"
+let version () = "v1.4.4+b1"
 
 let lowerCase (s: string) = s.ToLower()
 
