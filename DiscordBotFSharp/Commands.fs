@@ -2,16 +2,14 @@ module Commands
 
 open System
 open System.Threading.Tasks
-open Discord.Commands
 open Discord.WebSocket
 open Types
 open Plugins
 open Util
 
 /// not private so it can be used by plugins
-let sendMsg client msg msgOut =
-    let context = SocketCommandContext(client, msg)
-    context.Channel.SendMessageAsync(stampMsg msgOut) :> Task
+let sendMsg _ (msg: SocketUserMessage) msgOut =
+    msg.Channel.SendMessageAsync(stampMsg msgOut) :> Task
 
 let private echo client msg = function
     | [S s] -> sendMsg client msg s |> Success

@@ -19,3 +19,14 @@ module VersionPlugin =
 
     [<NamedCommandAttribute("version")>]
     type T() = interface ICommand with member t.Execute = version
+
+module HelpPlugin =
+    let private help client msg _ = 
+        botCommands() 
+        |> List.map (fun (k, _) -> k) 
+        |> sprintf "%A" 
+        |> sendMsg client msg 
+        |> Success
+
+    [<NamedCommandAttribute("help")>]
+    type T() = interface ICommand with member t.Execute = help
