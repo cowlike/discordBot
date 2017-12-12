@@ -2,7 +2,7 @@ module Util
 
 ///Some helper functions
 
-let version () = "v1.4.4+b1"
+let version () = "v1.4.4-b3"
 
 let lowerCase (s: string) = s.ToLower()
 
@@ -30,4 +30,4 @@ let (<**>) mf x =
 
 let now (fmt: string) = System.DateTime.Now.ToString(fmt)
 
-let stampMsg msg = now "MM/dd hh:mm:ss:FFF" + ": " + msg
+let stampMsg msg = now "MM/dd HH:mm:ss:FFF" + ": " + msg
