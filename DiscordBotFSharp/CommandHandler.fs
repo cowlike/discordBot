@@ -55,12 +55,12 @@ let private buildHandler (client: DiscordSocketClient) msgReceiver =
 
 /// Public API
 
-let public runBot token botCommands = 
+let public runBot token logLevel botCommands = 
     try
         let msgReceiver = botCommands |> mkCommandRetriever |> messageReceived
 
         let cfg = DiscordSocketConfig()
-        cfg.LogLevel <- LogSeverity.Debug        
+        cfg.LogLevel <- logLevel
         let client = new DiscordSocketClient(cfg)
 
         buildHandler client msgReceiver
