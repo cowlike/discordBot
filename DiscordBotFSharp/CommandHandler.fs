@@ -27,8 +27,8 @@ let private doCommand commands client (msg: SocketUserMessage) =
         (client, msg, args) 
         |||> handler
         |> function
-            | Success task -> task
-            | Fail err -> errorMsg err client msg
+           | Success task -> task
+           | Fail err -> errorMsg err client msg
     | Failure (error, _, _) -> errorMsg error client msg
 
 let private messageReceived commands client _ (sm: SocketMessage) = 
@@ -44,13 +44,14 @@ let private mkCommandRetriever commandList =
     let cmds = commandList |> Map.ofList
     fun cmdName -> Option.defaultValue (unknown "Unknown command") <| Map.tryFind cmdName cmds
 
-let private logTask msg = 
-    fun () -> printfn "%s" <| stampMsg msg
+let private logTask (msg: LogMessage) = 
+    let msgOut = sprintf "[%A] %s" msg.Severity <| msg.ToString(null, true, false)
+    fun () -> stampMsg msgOut |> printfn "%s"
     |> Task.Factory.StartNew
 
 let private buildHandler (client: DiscordSocketClient) msgReceiver = 
     let service = CommandService()
-    client.add_Log(fun msg -> msg.ToString() |> logTask)
+    client.add_Log(fun msg -> logTask msg)
     client.add_MessageReceived(fun sm -> msgReceiver client service sm)
 
 /// Public API
