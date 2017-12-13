@@ -1,23 +1,13 @@
 module PluginBundle
 
+open System
+open System.Threading.Tasks
+open Discord.WebSocket
+
 open Plugins
 open Types
 open Commands
 open Util
-open System.Threading
-open System.Threading.Tasks
-
-let withFail f client msg args = 
-    try f client msg args 
-    with exn -> exn.Message |> Fail
-
-module EchoPlugin =
-    let private echo client msg = function
-        | [S s] -> sendMsg client msg (s + " " + s) |> Success
-        | _ -> Fail "echoTwice takes a single string"
-
-    [<NamedCommandAttribute("echoTwice")>]
-    type T() = interface ICommand with member t.Execute = withFail echo
 
 module VersionPlugin =
     let private version client msg _ = 
@@ -37,3 +27,61 @@ module HelpPlugin =
 
     [<NamedCommandAttribute("help")>]
     type T() = interface ICommand with member t.Execute = withFail help
+
+
+module ChannelPlugins =
+    let private join ch (xs: seq<string>) = String.Join(ch, xs)
+
+
+    let private showChannels channels =
+        let showChannel (ch: SocketChannel) = 
+            sprintf "(%A, %s, %A)" (ch.Id) (ch.ToString()) (ch.GetType())
+        "[" + (Seq.map showChannel channels |> join "\n") + "]\n"
+
+    let private showGuilds (client: DiscordSocketClient) msg _ = 
+        client.Guilds |>
+        Seq.map (fun (g: SocketGuild) -> g.Name + ": " + showChannels g.Channels)
+        |> join ", "
+        |> sendMsg client msg
+        |> Success
+
+    let private showDMChannels (client: DiscordSocketClient) msg _ = 
+        showChannels client.DMChannels
+        |> sendMsg client msg
+        |> Success
+
+    let private newChannel (client: DiscordSocketClient) _ = function
+        | S channelName :: _ -> 
+            try
+                let guild = client.Guilds |> Seq.head
+                guild.CreateTextChannelAsync(channelName) :> Task
+                |> Success
+            with ex -> Fail ex.Message
+        | _ -> Fail "Missing channel name"
+
+    let private rmChannel (client: DiscordSocketClient) (msg: SocketUserMessage) args = 
+        let rm (ch: SocketGuildChannel) = ch.DeleteAsync() |> Success
+        try
+            let guild = client.Guilds |> Seq.head
+            match args with
+            | U64 id :: _ -> 
+                guild.GetChannel id |> rm
+            | S name :: _ ->
+                guild.Channels
+                |> Seq.find (fun (ch: SocketGuildChannel) -> ch.Name = name)
+                |> rm
+            | _ -> Fail "Missing channel id"
+        with ex -> Fail ex.Message
+
+    [<NamedCommandAttribute("showGuilds")>]
+    type T1() = interface ICommand with member t.Execute = withFail showGuilds
+
+    [<NamedCommandAttribute("showDMChannels")>]
+    type T2() = interface ICommand with member t.Execute = withFail showDMChannels
+
+    [<NamedCommandAttribute("newChannel")>]
+    type T3() = interface ICommand with member t.Execute = withFail newChannel
+
+    [<NamedCommandAttribute("rmChannel")>]
+    type T4() = interface ICommand with member t.Execute = withFail rmChannel
+
