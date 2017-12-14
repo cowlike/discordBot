@@ -19,10 +19,14 @@ before_script:
   - mkdir -p ~/.ssh
   - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
 build:
- stage: build
- script:
-   - 'dotnet build'
-   - 'dotnet test UnitTests/UnitTests.fsproj'
-   - 'dotnet publish -c release -r linux-x64 -o publish'
- only:
-   - master
+  stage: build
+  script:
+    - 'dotnet build'
+    - 'dotnet test UnitTests/UnitTests.fsproj'
+    - 'dotnet publish -c release -r linux-x64 -o publish'
+    - ssh ${USER}@${IP} '( killall DiscordBotFSharp; echo "stopped" )'
+    - scp -r /builds/cowlike/discordFSharp/DiscordBotFSharp/publish/ ${USER}@${IP}:/opt/bot
+    - ssh ${USER}@${IP} /home/${USER}/runbot.sh "$BOT_TOKEN"
+   
+  only:
+    - master
