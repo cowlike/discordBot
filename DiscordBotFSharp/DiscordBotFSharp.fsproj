@@ -14,7 +14,8 @@
     <Compile Include="Main.fs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="discord.net" Version="2.0.0-beta-00854" />
+    <!--<PackageReference Include="discord.net" Version="2.0.0-beta-00854" />-->
+    <PackageReference Include="discord.net" Version="1.0.2" />
     <PackageReference Include="fparsec" Version="1.0.3" />
     <PackageReference Include="System.Composition" Version="1.1.0" />
   </ItemGroup>
