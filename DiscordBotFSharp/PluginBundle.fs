@@ -10,13 +10,6 @@ open Commands
 open Util
 open Discord
 
-module VersionPlugin =
-    let private version client msg _ = 
-        version() |> sendMsg client msg |> Success
-
-    [<NamedCommandAttribute("version")>]
-    type T() = interface ICommand with member t.Execute = withFail version
-
 module HelpPlugin =
     let private help client msg _ = 
         botCommands() 

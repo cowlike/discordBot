@@ -1,14 +1,16 @@
 # Overview
 
-This is a simple test bot that implements a few commands. All commands are preceded by the string "//". The bot only responds to messages starting with "//" that have not been sent by a bot (including itself!)
+This is a simple test bot that implements a few commands. All commands are preceded by the string "//". The bot only responds to messages starting with "//" that have not been sent by a bot (including itself!). You can also DM the bot with or without the "//" prefix.
 
 All of this can change at any time:
 
+* help
+* version
 * echo "a string"
 * showArgs 32I 42 98.4 "98.4" True 64U 99999999999999997
 * showGuilds
 * showDMChannels
-* addChannel name
+* newChannel name
 * rmChannel name
 * rmChannel 1234567890U //channel id
 
