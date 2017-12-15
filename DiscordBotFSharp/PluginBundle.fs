@@ -8,6 +8,7 @@ open Plugins
 open Types
 open Commands
 open Util
+open Discord
 
 module VersionPlugin =
     let private version client msg _ = 
@@ -50,19 +51,19 @@ module ChannelPlugins =
         |> sendMsg client msg
         |> Success
 
-    let private newChannel (client: DiscordSocketClient) _ = function
+    let private newChannel _ (msg: SocketMessage) = function
         | S channelName :: _ -> 
             try
-                let guild = client.Guilds |> Seq.head
+                let guild = let c = (msg.Channel :?> IGuildChannel) in c.Guild
                 guild.CreateTextChannelAsync(channelName) :> Task
                 |> Success
             with ex -> Fail ex.Message
-        | _ -> Fail "Missing channel name"
+        | _ -> Fail <| sprintf "Missing channel name"
 
-    let private rmChannel (client: DiscordSocketClient) (msg: SocketUserMessage) args = 
+    let private rmChannel _ (msg: SocketUserMessage) args = 
         let rm (ch: SocketGuildChannel) = ch.DeleteAsync() |> Success
         try
-            let guild = client.Guilds |> Seq.head
+            let guild = let c = (msg.Channel :?> SocketGuildChannel) in c.Guild
             match args with
             | U64 id :: _ -> 
                 guild.GetChannel id |> rm
