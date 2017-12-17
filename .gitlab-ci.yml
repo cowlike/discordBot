@@ -24,6 +24,11 @@ before_script:
 
 build:
   stage: build
+  cache:
+    key: app
+    paths:
+      - DiscordBotFSharp/publish
+
   script:
     - 'dotnet build'
     - 'dotnet test UnitTests/UnitTests.fsproj'
@@ -34,9 +39,15 @@ build:
 
 deploy_aws:
   stage: deploy
+  cache:
+    key: app
+    paths:
+      - DiscordBotFSharp/publish
+    policy: pull
+
   script:
     - ssh ${USER}@${IP} '( killall DiscordBotFSharp; echo "stopped" )'
-    - scp -r /builds/cowlike/discordFSharp/DiscordBotFSharp/publish/ ${USER}@${IP}:/opt/bot
+    - scp -r DiscordBotFSharp/publish/ ${USER}@${IP}:/opt/bot
     - ssh ${USER}@${IP} /home/${USER}/runbot.sh "$BOT_TOKEN"
 
   only:
@@ -44,9 +55,15 @@ deploy_aws:
 
 deploy_azure:
   stage: deploy
+  cache:
+    key: app
+    paths:
+      - DiscordBotFSharp/publish
+    policy: pull
+
   script:
     - ssh ${USER_AZURE}@${IP_AZURE} '( killall DiscordBotFSharp; echo "stopped" )'
-    - scp -r /builds/cowlike/discordFSharp/DiscordBotFSharp/publish/ ${USER_AZURE}@${IP_AZURE}:/opt/bot
+    - scp -r DiscordBotFSharp/publish/ ${USER_AZURE}@${IP_AZURE}:/opt/bot
     - ssh ${USER_AZURE}@${IP_AZURE} /home/${USER_AZURE}/runbot.sh "$BOT_TOKEN_AZURE"
 
   only:
